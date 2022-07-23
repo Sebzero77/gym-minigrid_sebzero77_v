@@ -44,4 +44,6 @@ $ python
 >>> env.render()
 >>> env.close()
 ````
+An .py example [here](https://github.com/EnriqueGap/gym-minigrid/blob/nmaproject/actions.py)
+
 Now you are ready!. You can create scripts or jupyternotebooks inside gym-minigrid repo and load your environments!!
