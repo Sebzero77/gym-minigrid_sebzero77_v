@@ -25,7 +25,7 @@ def make_action(i):
 		return
 
 #load the environment and create the object
-env = gym.make('MiniGrid-Empty-8x8-v0')
+env = gym.make('MiniGrid-T-16x16-v0')
 obs = env.reset()
 #actions "random"
 for i in range(0,100):
