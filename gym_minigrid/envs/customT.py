@@ -86,3 +86,10 @@ register(
     id='MiniGrid-T-18x18-v0',
     entry_point='gym_minigrid.envs:TEnv18x18'
 )
+class TEnv27x27(TEnv):
+    def __init__(self, **kwargs):
+        super().__init__(size=27,**kwargs)
+register(
+    id='MiniGrid-T-27x27-v0',
+    entry_point='gym_minigrid.envs:TEnv27x27'
+)
