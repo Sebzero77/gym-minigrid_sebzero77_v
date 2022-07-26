@@ -47,6 +47,9 @@ OBJECT_TO_IDX = {
     'goal'          : 8,
     'lava'          : 9,
     'agent'         : 10,
+    'highgoal'      : 11,
+    'lowgoal'       : 12,
+    'midgoal'       : 13,
 }
 
 IDX_TO_OBJECT = dict(zip(OBJECT_TO_IDX.values(), OBJECT_TO_IDX.keys()))
@@ -140,6 +143,12 @@ class WorldObj:
             v = Door(color, is_open, is_locked)
         elif obj_type == 'goal':
             v = Goal()
+        elif obj_type == 'highgoal':
+            v = HighGoal()
+        elif obj_type == 'lowgoal':
+            v = LowGoal()
+        elif obj_type == 'midgoal':
+            v = MidGoal()
         elif obj_type == 'lava':
             v = Lava()
         else:
@@ -160,7 +169,33 @@ class Goal(WorldObj):
 
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+class HighGoal(WorldObj):
+    def __init__(self):
+        super().__init__('highgoal', 'green')
 
+    def can_overlap(self):
+        return True
+
+    def render(self, img):
+        fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+class LowGoal(WorldObj):
+    def __init__(self):
+        super().__init__('lowgoal', 'green')
+
+    def can_overlap(self):
+        return True
+
+    def render(self, img):
+        fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+class MidGoal(WorldObj):
+    def __init__(self):
+        super().__init__('midgoal', 'green')
+
+    def can_overlap(self):
+        return True
+
+    def render(self, img):
+        fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])        
 class Floor(WorldObj):
     """
     Colored floor tile the agent can walk over
@@ -650,6 +685,7 @@ class MiniGridEnv(gym.Env):
         max_steps=100,
         see_through_walls=False,
         seed=1337,
+        # Change this to full knowledge of environment
         agent_view_size=7
     ):
         # Can't set both grid_size and width/height
@@ -682,7 +718,7 @@ class MiniGridEnv(gym.Env):
         })
 
         # Range of possible rewards
-        self.reward_range = (0, 1)
+        self.reward_range = (0, 5)
 
         # Window to use for human rendering mode
         self.window = None
@@ -768,6 +804,9 @@ class MiniGridEnv(gym.Env):
             'ball'          : 'A',
             'box'           : 'B',
             'goal'          : 'G',
+            'highgoal'      : 'G',
+            'midgoal'       : 'G',
+            'lowgoal'       : 'G',                                    
             'lava'          : 'V',
         }
 
@@ -822,7 +861,30 @@ class MiniGridEnv(gym.Env):
         """
 
         return 1 - 0.9 * (self.step_count / self.max_steps)
-
+    def _highreward(self):
+        """
+        Compute the reward to be given upon success
+        """
+        base=1
+        random=np.abs(np.random.normal(0,0.5))
+        total = base+random
+        return total - 0.9 * (self.step_count / self.max_steps)        
+    def _midreward(self):
+        """
+        Compute the reward to be given upon success
+        """
+        base=0.5
+        random=np.abs(np.random.normal(0,0.5))
+        total = base+random
+        return total - 0.9 * (self.step_count / self.max_steps)
+    def _lowreward(self):
+        """
+        Compute the reward to be given upon success
+        """
+        base=0
+        random=np.abs(np.random.normal(0,0.5))
+        total = base+random
+        return total - 0.9 * (self.step_count / self.max_steps)        
     def _rand_int(self, low, high):
         """
         Generate random integer in [low,high[
@@ -1125,6 +1187,15 @@ class MiniGridEnv(gym.Env):
             if fwd_cell != None and fwd_cell.type == 'goal':
                 done = True
                 reward = self._reward()
+            if fwd_cell != None and fwd_cell.type == 'highgoal':
+                done = True
+                reward = self._highreward()
+            if fwd_cell != None and fwd_cell.type == 'midgoal':
+                done = True
+                reward = self._midreward()
+            if fwd_cell != None and fwd_cell.type == 'lowgoal':
+                done = True
+                reward = self._lowreward()
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
 
