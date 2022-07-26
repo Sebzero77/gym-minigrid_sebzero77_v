@@ -90,3 +90,10 @@ register(
     id='MiniGrid-Sharp-18x18-v0',
     entry_point='gym_minigrid.envs:SharpEnv18x18'
 )
+class SharpEnv27x27(SharpEnv):
+    def __init__(self, **kwargs):
+        super().__init__(size=27,**kwargs)
+register(
+    id='MiniGrid-Sharp-27x27-v0',
+    entry_point='gym_minigrid.envs:SharpEnv27x27'
+)
